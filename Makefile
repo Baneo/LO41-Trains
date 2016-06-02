@@ -6,7 +6,7 @@ all: main
 main: main.o
 	$(CC) -o $@ $^
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
