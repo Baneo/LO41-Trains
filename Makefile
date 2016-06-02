@@ -7,7 +7,7 @@ main: main.o
 	$(CC) -o $@ $^
 
 %.o: %.c %.h
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 clean:
 	rm -rf *.o

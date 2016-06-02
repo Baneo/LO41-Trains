@@ -1,8 +1,13 @@
+#ifndef MAINTEST_H
+#define MAINTEST_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(void)
+void maintest()
 {
-  printf("Hello World !");
-  return EXIT_SUCCESS;
+  printf("Hello !");
+  
 }
+
+#endif
