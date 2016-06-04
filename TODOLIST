@@ -4,3 +4,5 @@
 *Moniteurs
 *Main
 *Threads
+
+** Penser a gérere les signaux ctrl-c ctrl-z, avec vidage préalable des tables ipc etc, il y aura vérification!!**
