@@ -40,8 +40,9 @@ return F;
 *  add a train.
 *  t : a train
 */
-Polygon addTrain(FileTrain f, int t)
+FileTrain addTrain(FileTrain f, int t)
 {
+  int i;
 	 Element* newElem = (Element*)malloc(sizeof(Element));
 	 newElem -> train = t;
     if (f.length == 0)
@@ -51,8 +52,8 @@ Polygon addTrain(FileTrain f, int t)
 		  f.length = 1;
     }
     else
-    {   newElem->next = h.head;
-      for (size_t i = 1; i < length; i++) {
+    {   newElem->next = f.head;
+      for (i = 1; i < f.length; i++) {
         newElem->next = newElem->next->next;
         }
     newElem->next->next = newElem;
@@ -60,7 +61,7 @@ Polygon addTrain(FileTrain f, int t)
 		f.length = f.length + 1;
     }
 
-return h;
+return f;
 }
 
 /* Function removeTrain
@@ -69,11 +70,10 @@ return h;
 
 *  f : a TrainLine, the one we want to delete the first train in line.
 */
-// PAS ENCORE TERMINE!!!!!!!!!!!!!!
-Polygon removeTrain(TrainLine t)
+FileTrain removeTrain(FileTrain t)
 {
 
-    Element* m = h.head;
+    Element* m = t.head;
     if (t.length == 0)
     {
         return t;
@@ -83,16 +83,16 @@ Polygon removeTrain(TrainLine t)
         t.length = 0;
         free(t.head);
         t.head = NULL;
-        return h;
+        return t;
     }
 	 else
         {
 		  m -> next -> next = m -> next;
 		  free(m);
-        h.length = h.length - 1;
+        t.length = t.length - 1;
 
     }
-return h;
+return t;
 }
 /* Function PrintTrainLine
 *
@@ -101,19 +101,22 @@ return h;
 *t : A TrainLine that we want to explore.
 */
 
-void PrintTrainLine(TrainLine t)
+void PrintTrainLine(FileTrain t)
 {
+  int i;
   Element* m = t.head;
-  for (size_t i = 0; i < t.length; i++) {
-    printf("Le train numéro %d est le train %d",i,m.train);
-    m=m.next;
+  for (i = 0; i < t.length; i++) {
+    printf("Le train numéro %d est le train %d",i,m->train);
+    m=m->next;
   }
 }
 
 
 void maintest()
 {
-
+FileTrain FT1;
+FT1 = createFileTrain();
+printf("FileTrain Crée");
 
 }
 
