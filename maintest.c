@@ -3,6 +3,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
+
+int shmid, i;
+FileTrain *p;
+
+shmid = shmget(IPC_PRIVATE, sizeof(FileTrain), 0666);
+p = (FileTrain *)shmat(shmid, NULL, 0);
 
 typedef struct elem{
     int train;
