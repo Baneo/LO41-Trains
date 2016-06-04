@@ -9,10 +9,6 @@
 #include <sys/wait.h>
 
 int shmid, i;
-FileTrain *p;
-
-shmid = shmget(IPC_PRIVATE, sizeof(FileTrain), 0666);
-p = (FileTrain *)shmat(shmid, NULL, 0);
 
 typedef struct elem{
     int train;
@@ -23,6 +19,8 @@ typedef struct {
     Element* head;
     int length;
 }FileTrain;
+
+FileTrain *p;
 
 /* Function createTrainLine
 *
@@ -125,6 +123,8 @@ void PrintTrainLine(FileTrain t)
 void maintest()
 {
 FileTrain FT1;
+shmid = shmget(IPC_PRIVATE, sizeof(FileTrain), 0666);
+p = (FileTrain *)shmat(shmid, NULL, 0);
 FT1 = createFileTrain();
 printf("FileTrain Crée");
 FT1 = addTrain(FT1, 12);
@@ -133,6 +133,7 @@ FT1 = addTrain(FT1, 18);
 PrintTrainLine(FT1);
 FT1 = removeTrain(FT1);
 PrintTrainLine(FT1);
+shmctl(shmid, IPC_RMID, NULL);
 }
 
 #endif
