@@ -106,7 +106,7 @@ void PrintTrainLine(FileTrain t)
   int i;
   Element* m = t.head;
   for (i = 0; i < t.length; i++) {
-    printf("Le train numéro %d est le train %d",i,m->train);
+    printf("Le train numéro %d est le train %d",i+1,m->train);
     m=m->next;
   }
 }
@@ -117,7 +117,12 @@ void maintest()
 FileTrain FT1;
 FT1 = createFileTrain();
 printf("FileTrain Crée");
-
+FT1 = addTrain(FT1, 12);
+FT1 = addTrain(FT1, 15);
+FT1 = addTrain(FT1, 18);
+PrintTrainLine(FT1);
+FT1 = removeTrain(FT1);
+PrintTrainLine(FT1);
 }
 
 #endif
