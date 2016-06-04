@@ -40,7 +40,7 @@ return F;
 *  add a train.
 *  t : a train
 */
-Polygon addTrain(FileTrain f, t)
+Polygon addTrain(FileTrain f, int t)
 {
 	 Element* newElem = (Element*)malloc(sizeof(Element));
 	 newElem -> train = t;
@@ -87,14 +87,29 @@ Polygon removeTrain(TrainLine t)
     }
 	 else
         {
-		  m -> next -> prev = m -> prev;
-		  m -> prev -> next = m -> next;
+		  m -> next -> next = m -> next;
 		  free(m);
         h.length = h.length - 1;
 
     }
 return h;
 }
+/* Function PrintTrainLine
+*
+*This function prints a TrainLine on the console terminal, it takes a TrainLine and return nothing.
+*
+*t : A TrainLine that we want to explore.
+*/
+
+void PrintTrainLine(TrainLine t)
+{
+  Element* m = t.head;
+  for (size_t i = 0; i < t.length; i++) {
+    printf("Le train numéro %d est le train %d",i,m.train);
+    m=m.next;
+  }
+}
+
 
 void maintest()
 {
