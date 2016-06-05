@@ -1,13 +1,41 @@
+#define _XOPEN_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
+#include <pthread.h>
 #include "maintest.h"
-#include "parser.h"
+
+
+
+pthread_t tid[60];
+
+void fonc_EST()
+{
+
+}
+void fonc_A()
+{
+
+}
+void fonc_C()
+{
+
+}
+
+
 
 int main(void)
 {
+
+
   int i = 0,j = 0, number = 0, count = 0,x;
+  int Nb_A = 0, Nb_C = 0, Nb_EST = 0;
   char file_name[100] = "";
   char line[128];
   int size;
@@ -28,6 +56,7 @@ int main(void)
 
 
   output = malloc (size * sizeof (int *));
+
 
   for (x = 0;x < 3;x ++)
   {
@@ -55,11 +84,19 @@ int main(void)
     else if (strncmp(line, "EST", 3) == 0)
     {
       output[number][count] = 5;
+      if (count == 1)
+      {
+        Nb_EST ++;
+      }
       count ++;
     }
     else if (strncmp(line, "A", 1) == 0)
     {
       output[number][count] = 1;
+      if (count == 1)
+      {
+        Nb_A ++;
+      }
       count ++;
     }
     else if (strncmp(line, "B", 1) == 0)
@@ -70,6 +107,10 @@ int main(void)
     else if (strncmp(line, "C", 1) == 0)
     {
       output[number][count] = 3;
+      if(count == 1)
+      {
+        Nb_C ++;
+      }
       count ++;
     }
     else if (strncmp(line, "D", 1) == 0)
@@ -99,6 +140,34 @@ int main(void)
       printf("MAIN tab output :%d\n", output[i][j]);
     }
   }
+
+
+
+
+
+  for(number = 0;number < Nb_EST;number ++)
+  {
+    pthread_create(tid+number,0,void*(*)())fonc_EST,(void*)number);
+  }
+
+  for(number = 0;number < Nb_A;number ++)
+  {
+    pthread_create(tid+number,0,void* (*fonc_A()),(void*)number);
+  }
+
+  for(number = 0;number < Nb_C;number ++)
+  {
+    pthread_create(tid+number,0,void* (*fonc_C()),(void*)number);
+  }
+
+  for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
+  {
+      pthread_join(tid[number],NULL);
+  }
+
+
+
+
 
   maintest();
   return EXIT_SUCCESS;
