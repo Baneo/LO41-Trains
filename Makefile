@@ -7,7 +7,7 @@ main: main.o maintest.o
 	$(CC) -o $@ $^
 
 %.o: %.c %.h
-	$(CC) -o  $@ -c $< $(CFLAGS)
+	$(CC) -o  $@ -c $< #$(CFLAGS)
 
 
 clean:
