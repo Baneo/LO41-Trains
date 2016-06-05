@@ -3,11 +3,12 @@ CFLAGS=-W -Wall -ansi -pedantic -Werror
 
 all: main
 
-main: main.o
+main: main.o maintest.o
 	$(CC) -o $@ $^
 
 %.o: %.c %.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -o  $@ -c $< $(CFLAGS)
+
 
 clean:
 	rm -rf *.o
