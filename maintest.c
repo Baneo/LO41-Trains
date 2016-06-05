@@ -3,13 +3,17 @@
 
 #define _XOPEN_SOURCE
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/wait.h>
+#include <pthread.h>
 
+pthread_mutex_t mutex;
+pthread_cond_t P0lC, P1G1, P1G2, P1D1, P1D2, P1D3, P1D4, P2G1, P2G2, P2G3, P2G4, P2D1, P3G1, P3D1;
 int shmid, i;
 
 typedef struct elem{
