@@ -36,13 +36,13 @@ int main(void)
 
   int i = 0,j = 0, number = 0, count = 0,x;
   int Nb_A = 0, Nb_C = 0, Nb_EST = 0;
-  char file_name[100] = "";
+  char file_name[100];
   char line[128];
   int size;
   FILE* input;
   int ** output;
   printf("Entrez le chemin du fichier a utiliser:\n");
-  gets(file_name);
+  scanf("%s", file_name);
   printf("Fichier: %s\n", file_name);
 
 
