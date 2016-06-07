@@ -9,7 +9,7 @@
 #include <sys/shm.h>
 #include <sys/wait.h>
 #include <pthread.h>
-#include "maintest.h"
+
 
 
 pthread_t tid[60];
@@ -17,6 +17,7 @@ pthread_mutex_t mutex;
 pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
 int shmid, i;
+int print_full_info = 1;
 
 typedef struct elem{
     int train;
@@ -128,8 +129,13 @@ void PrintTrainLine(FileTrain t)
 }
 
 
-void fonc_EST(int numero[])
+void* fonc_EST(void* arg)
 {
+  int *numero = (int*)arg;
+  if(print_full_info == 1)
+  {
+    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+  }
   pthread_mutex_lock (&mutex);
   printf("Le Train Préviens le Chef qu'il est la.");
   addTrain(p[3],numero[0]);
@@ -137,69 +143,84 @@ void fonc_EST(int numero[])
   pthread_cond_wait(&LEST,&mutex);
   removeTrain(p[3]);
   printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[0]);
-  if (numero[4]=0 /*TGV*/) {
+  if (numero[4] == 0) /*TGV*/ {
     addTrain(p[4],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4]=1 /*M*/) {
+  else if (numero[4] ==1) /*M*/ {
     addTrain(p[5],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4]=2 /*GL*/) {
+  else if (numero[4] == 2) /*GL*/ {
     addTrain(p[6],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
   }
   printf("Le Train part vers sa destination finale.\n");
   pthread_mutex_unlock(&mutex);
-}
-void fonc_A()
-{
+  return 0;
 
 }
-void fonc_C()
+void* fonc_A(void* arg)
 {
-
+  int *numero = (int*)arg;
+  if(print_full_info == 1)
+  {
+    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+  }
+  return 0;
+}
+void* fonc_C(void* arg)
+{
+  int *numero = (int*)arg;
+  if(print_full_info == 1)
+  {
+    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+  }
+  return 0;
 }
 
 
 
 int main(void)
 {
-
-
-  int i = 0,j = 0, number = 0, count = 0,x;
-  int Nb_A = 0, Nb_C = 0, Nb_EST = 0;
+  /*variables utiles au développement du programme*/
+  int i = 0,j = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+  /*variable utilisées pour les buffers de lecture du fichier*/
   char file_name[100];
   char line[128];
-  int size;
+  /*variable d'entrée de la lecture du fichier et variable de sortie avec toutes les informations nécéssaires*/
   FILE* input;
   int ** output;
+  /*tableau d'informations sur le train (depart, arrivée, type)*/
+  int numero[3];
+
+  /*récupération du nom du fichier*/
   printf("Entrez le chemin du fichier a utiliser:\n");
   scanf("%s", file_name);
   printf("Fichier: %s\n", file_name);
 
-
+  /*lecture du fichier*/
   if((input = fopen(file_name, "r")) == NULL)
   {
     perror("Wrong input");
     return 1;
   }
+
   fgets(line, sizeof line, input);
-  size = atoi(line)+1;
+  /*acquisition de la taille du tableau output*/
+  size = atoi(line);
 
-
+  /*allocation de l'espace pour le tableau output*/
   output = malloc (size * sizeof (int *));
-
-
   for (x = 0;x < 3;x ++)
   {
     output[x] = malloc (3 * sizeof (int));
   }
 
-
+  /*boucle de remplisage du tableau output*/
   while(fgets(line, sizeof line, input) != NULL)
   {
     if (strncmp(line, "TGV", 3) == 0)
@@ -267,41 +288,122 @@ int main(void)
   }
   fclose(input);
 
-  for (i = 0; i < 3; i++)
+  /*vérification des informations*/
+  if (print_full_info == 1)
   {
-    printf("i=%d\n", i);
-    for(j = 0; j < 3; j++)
+    for (i = 0; i < size; i++)
     {
-      printf("j=%d\n",j);
-      printf("MAIN tab output :%d\n", output[i][j]);
+      printf("i=%d\n", i);
+      for(j = 0; j < 3; j++)
+      {
+        printf("j=%d\n",j);
+        printf("MAIN tab output :%d\n", output[i][j]);
+      }
     }
   }
 
-/*
+
+  /*boucle de création du thread en fonction de la zone de départ*/
   for(number = 0;number < Nb_EST;number ++)
+
   {
-    int numero [3];
-    Remplir avc if + boucle
-    creation tableau nombre et injection des valeurs dedans.
-    pthread_create(tid+number,0,void*(*)())fonc_EST,(void*)number);
+    for (i = 0; i < size; i++)
+    {
+      if (output[i][1] == 5)
+      {
+
+        for(j = 0; j < 3; j++)
+        {
+          numero[j] = output[i][j];
+        }
+      }
+    }
+    /*verification du contenu avant de le passer au thread*/
+    if(print_full_info == 1)
+    {
+      for (i = 0; i < 3 ; i++)
+      {
+        printf("contenu de numero, case %d :%d\n", i, numero[i]);
+      }
+    }
+    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+
+    if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) numero))
+    {
+	     perror("pthread_create");
+	     return EXIT_FAILURE;
+    }
+
   }
 
-  for(number = 0;number < Nb_A;number ++)
+  for(number = number;number < Nb_A + Nb_EST;number ++)
   {
-    pthread_create(tid+number,0,void* (*fonc_A()),(void*)number);
+
+    for (i = 0; i < size; i++)
+    {
+      if (output[i][1] == 1)
+      {
+
+        for(j = 0; j < 3; j++)
+        {
+          numero[j] = output[i][j];
+        }
+      }
+    }
+    /*verification du contenu avant de le passer au thread*/
+    if(print_full_info == 1)
+    {
+      for (i = 0; i < 3 ; i++)
+      {
+        printf("contenu de numero, case %d :%d\n", i, numero[i]);
+      }
+    }
+    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+
+    if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
+    {
+	     perror("pthread_create");
+	     return EXIT_FAILURE;
+    }
   }
 
-  for(number = 0;number < Nb_C;number ++)
+  for(number = number;number < Nb_C + Nb_A + Nb_EST;number ++)
   {
-    pthread_create(tid+number,0,void* (*fonc_C()),(void*)number);
+
+    for (i = 0; i < size; i++)
+    {
+      if (output[i][1] == 3)
+      {
+
+        for(j = 0; j < 3; j++)
+        {
+          numero[j] = output[i][j];
+        }
+      }
+    }
+    /*verification du contenu avant de le passer au thread*/
+    if(print_full_info == 1)
+    {
+      for (i = 0; i < 3 ; i++)
+      {
+        printf("contenu de numero, case %d :%d\n", i, numero[i]);
+      }
+    }
+    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+
+    if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
+    {
+	     perror("pthread_create");
+	     return EXIT_FAILURE;
+    }
   }
 
   for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
   {
       pthread_join(tid[number],NULL);
-  }*/
+  }
 
-  FileTrain FT1;
+  /*
   shmid = shmget(IPC_PRIVATE, sizeof(FileTrain), 0666);
   p = (FileTrain *)shmat(shmid, NULL, 0);
   FT1 = createFileTrain();
@@ -312,6 +414,6 @@ int main(void)
   PrintTrainLine(FT1);
   FT1 = removeTrain(FT1);
   PrintTrainLine(FT1);
-  shmctl(shmid, IPC_RMID, NULL);
+  shmctl(shmid, IPC_RMID, NULL);*/
   return EXIT_SUCCESS;
 }
