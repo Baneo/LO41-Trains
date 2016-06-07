@@ -144,7 +144,7 @@ int main(void)
 
 
 
-
+/*
   for(number = 0;number < Nb_EST;number ++)
   {
     pthread_create(tid+number,0,void*(*)())fonc_EST,(void*)number);
@@ -163,7 +163,7 @@ int main(void)
   for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
   {
       pthread_join(tid[number],NULL);
-  }
+  }*/
 
 
 
