@@ -9,8 +9,9 @@
 #include <sys/shm.h>
 #include <sys/wait.h>
 #include <pthread.h>
-
-
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 pthread_t tid[60];
 pthread_mutex_t mutex;
@@ -138,13 +139,13 @@ void* fonc_EST(void* arg)
   }
   pthread_mutex_lock (&mutex);
   printf("Le Train Préviens le Chef qu'il est la.");
-  addTrain(p[3],numero[0]);
+  addTrain(p[2],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LEST,&mutex);
-  removeTrain(p[3]);
+  removeTrain(p[2]);
   printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[0]);
   if (numero[4] == 0) /*TGV*/ {
-    addTrain(p[4],numero[0]);
+    addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
@@ -169,8 +170,34 @@ void* fonc_A(void* arg)
   if(print_full_info == 1)
   {
     printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+
   }
+  pthread_mutex_lock (&mutex);
+  printf("Le Train Préviens le Chef qu'il est la.");
+  addTrain(p[0],numero[0]);
+  pthread_cond_signal(&superviseur);
+  pthread_cond_wait(&LA,&mutex);
+  removeTrain(p[0]);
+  printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
+  if (numero[4] == 0) /*TGV*/ {
+    addTrain(p[3],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&ATGV, &mutex);
+  }
+  else if (numero[4] ==1) /*M*/ {
+    addTrain(p[4],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&AM1, &mutex);
+  }
+  else if (numero[4] == 2) /*GL*/ {
+    addTrain(p[6],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&AGL, &mutex);
+  }
+  printf("Le Train part vers sa destination finale.\n");
+  pthread_mutex_unlock(&mutex);
   return 0;
+
 }
 void* fonc_C(void* arg)
 {
@@ -179,9 +206,60 @@ void* fonc_C(void* arg)
   {
     printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
   }
+  pthread_mutex_lock (&mutex);
+  printf("Le Train Préviens le Chef qu'il est la.");
+  addTrain(p[1],numero[0]);
+  pthread_cond_signal(&superviseur);
+  pthread_cond_wait(&LA,&mutex);
+  removeTrain(p[0]);
+  printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
+  if (numero[4] == 0) /*TGV*/ {
+    addTrain(p[3],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&ATGV, &mutex);
+  }
+  else if (numero[4] ==1) /*M*/ {
+    addTrain(p[4],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&AM1, &mutex);
+  }
+  else if (numero[4] == 2) /*GL*/ {
+    addTrain(p[6],numero[0]);
+    pthread_cond_signal(&superviseur);
+    pthread_cond_wait(&AGL, &mutex);
+  }
+  printf("Le Train part vers sa destination finale.\n");
+  pthread_mutex_unlock(&mutex);
   return 0;
 }
 
+/*Fonctions ruling the Signals*/
+
+void erreur(const char* msg) {
+
+  fprintf(stderr,"%s\n",msg);
+
+  }
+
+void traitantSIGINT(int num) {
+   if (num!=SIGTSTP){
+     erreur("Pb sur SigInt...");
+   }
+  printf("\n---- Suppression des tables IPC-----\n");
+  shmctl(shmid, IPC_RMID, NULL);
+  signal(SIGINT,SIG_DFL);
+  kill(getpid(),SIGINT);
+  }
+
+void traitantSIGTSTP(int num) {
+ if (num!=SIGTSTP){
+   erreur("Pb sur SigSTP...");
+ }
+    printf("\n---- Suppression des tables IPC-----\n");
+    shmctl(shmid, IPC_RMID, NULL);
+    signal(SIGTSTP,SIG_DFL);
+    kill(getpid(),SIGTSTP);
+  }
 
 
 int main(void)
@@ -196,6 +274,11 @@ int main(void)
   int ** output;
   /*tableau d'informations sur le train (depart, arrivée, type)*/
   int numero[3];
+
+/*Handler signaux*/
+
+signal(SIGINT,traitantSIGINT);
+signal(SIGTSTP,traitantSIGTSTP);
 
   /*récupération du nom du fichier*/
   printf("Entrez le chemin du fichier a utiliser:\n");
@@ -413,7 +496,7 @@ int main(void)
   FT1 = addTrain(FT1, 18);
   PrintTrainLine(FT1);
   FT1 = removeTrain(FT1);
-  PrintTrainLine(FT1);
-  shmctl(shmid, IPC_RMID, NULL);*/
+  PrintTrainLine(FT1);*/
+  shmctl(shmid, IPC_RMID, NULL);
   return EXIT_SUCCESS;
 }
