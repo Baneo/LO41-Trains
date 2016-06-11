@@ -440,7 +440,7 @@ signal(SIGTSTP,traitantSIGTSTP);
     }
 
   printf("Avant attente\n");
-  sleep(2000);
+  sleep(2);
   printf("Après attente\n");
   pthread_cond_signal(&superviseur);
 
