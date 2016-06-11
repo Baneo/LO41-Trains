@@ -142,16 +142,16 @@ void* fonc_EST(int* arg)
   if(print_full_info == 1)
   {
     printf("Ca passe bien la\n");
-    printf("valeur du tableau passé en argument(EST): type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
+    printf("valeur du tableau passé en argument(EST):no%d\n type:%d \n dpt:%d \n arr:%d\n",numero[3], numero[0], numero[1], numero[2]);
   }
 
   /*pthread_mutex_lock (&mutex);*/
-  printf("Le Train no %d previent le superviseur qu'il est la.", numero[0]);
+  printf("Le Train no %d previent le superviseur qu'il est la.", numero[3]);
   /*addTrain(p[2],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LEST,&mutex);
   removeTrain(p[2]);
-  */printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[0]);/*
+  */printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[3]);/*
   if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
@@ -167,7 +167,7 @@ void* fonc_EST(int* arg)
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
   }*/
-  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
   /*pthread_mutex_unlock(&mutex);*/
   return 0;
 
@@ -177,16 +177,16 @@ void* fonc_A(void* arg)
   int *numero = (int*)arg;
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
+    printf("valeur du tableau passé en argument:no%d\n type:%d \n dpt:%d \n arr:%d\n",numero[3], numero[0], numero[1], numero[2]);
   }
   /*
   pthread_mutex_lock (&mutex);
-  */printf("Le Train no %d previent le superviseur qu'il est la.", numero[0]);/*
+  */printf("Le Train no %d previent le superviseur qu'il est la.", numero[3]);/*
   addTrain(p[0],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.", numero[0]);/*
+  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.", numero[3]);/*
   if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
@@ -202,7 +202,7 @@ void* fonc_A(void* arg)
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
   }*/
-  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
   /*pthread_mutex_unlock(&mutex);*/
     return 0;
 
@@ -213,7 +213,7 @@ void* fonc_C(void* arg)
 
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
+    printf("valeur du tableau passé en argument: no: %d type:%d \n dpt:%d \n arr:%d\n", numero[3], numero[0], numero[1], numero[2]);
   }
   /*
   pthread_mutex_lock (&mutex);
@@ -222,7 +222,7 @@ void* fonc_C(void* arg)
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
+  */printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.", numero[3]);
   /*if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
@@ -238,7 +238,7 @@ void* fonc_C(void* arg)
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
   }*/
-  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
   /*pthread_mutex_unlock(&mutex);*/
   return 0;
 }
@@ -281,15 +281,14 @@ void traitantSIGTSTP(int num) {
 int main(void)
 {
   /*variables utiles au développement du programme*/
-  int i = 0, k=0, j = 0, o = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+  int i = 0, j = 0, o = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
   /*variable utilisées pour les buffers de lecture du fichier*/
   char file_name[100];
   char line[128];
   /*variable d'entrée de la lecture du fichier et variable de sortie avec toutes les informations nécéssaires*/
   FILE* input;
   int ** output;
-  /*tableau d'informations sur le train (depart, arrivée, type)*/
-  int numero[3];
+  
 
 /*Handler signaux*/
 
@@ -317,7 +316,7 @@ signal(SIGTSTP,traitantSIGTSTP);
 
   for (x = 0;x < size;x ++)
   {
-    output[x] = malloc (3 * sizeof (int));
+    output[x] = malloc (4 * sizeof (int));
   }
 
   /*boucle de remplisage du tableau output*/
@@ -409,20 +408,7 @@ signal(SIGTSTP,traitantSIGTSTP);
       printf("bonjour de debut de for!!\n");
       if (output[i][1] == 5)
       {
-
-        for(j = 1; j < 4; j++)
-        {
-          numero[j] = output[i][j-1];
-        }
-        numero[0] = i+1;
-        /*verification du contenu avant de le passer au thread*/
-        if(print_full_info == 1)
-        {
-          for (k = 0; k < 4 ; k++)
-          {
-            printf("contenu de numero, case %d :%d\n", k, numero[k]);
-          }
-        }
+        output[i][3] = i+1;
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
             printf("bonjour0\n");
@@ -434,19 +420,7 @@ signal(SIGTSTP,traitantSIGTSTP);
       else if (output[i][1] == 1)
       {
         printf("bonjour1\n");
-        for(j = 1; j < 4; j++)
-        {
-          numero[j] = output[i][j-1];
-        }
-        numero[0] = i+1;
-        /*verification du contenu avant de le passer au thread*/
-        if(print_full_info == 1)
-        {
-          for (k = 0; k < 4 ; k++)
-          {
-            printf("contenu de numero, case %d :%d\n", k, numero[i]);
-          }
-        }
+        output[i][3] = i+1;
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
         pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) output[i]);
             o++;
@@ -456,19 +430,8 @@ signal(SIGTSTP,traitantSIGTSTP);
       {
             printf("bonjour2\n");
 
-        for(j = 1; j < 4; j++)
-        {
-          numero[j] = output[i][j-1];
-        }
-        numero[0] = i+1;
-        /*verification du contenu avant de le passer au thread*/
-        if(print_full_info == 1)
-        {
-          for (k = 0; k < 4 ; k++)
-          {
-            printf("contenu de numero, case %d :%d\n", k, numero[i]);
-          }
-        }
+
+        output[i][3] = i+1;
         printf("o = %d\n", o);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
         pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) output[i]);
