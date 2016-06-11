@@ -141,39 +141,49 @@ void PrintTrainLine(FileTrain t)
 void* fonc_EST(int* arg)
 {
   int *numero = (int*)arg;
-  printf("Ca passe bien la\n");
   if(print_full_info == 1)
   {
-    printf("Ca passe bien la\n");
     printf("valeur du tableau passé en argument(EST):no%d\n type:%d \n dpt:%d \n arr:%d\n",numero[3], numero[0], numero[1], numero[2]);
   }
 
   pthread_mutex_lock (&mutex);
-  p[2] = addTrain(p[2],numero[0]);
+  p[2] = addTrain(p[2],numero[3]);
   pthread_cond_wait(&LEST,&mutex);
   p[2] = removeTrain(p[2]);
+  printf("num 0: %d\n", numero[0]);
   printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.\n", numero[3]);
-  if (numero[4] == 0){
-    p[3] = addTrain(p[3],numero[0]);
+  if (numero[0] == 1)
+  {
+    p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
-    p[6] = removeTrain(p[6]);
+    p[3] = removeTrain(p[3]);
   }
-  else if (numero[4] ==1) {
-    p[5] = addTrain(p[5],numero[0]);
+  else if (numero[0] == 3)
+  {
+    p[5] = addTrain(p[5],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
     p[5] = removeTrain(p[5]);
   }
-  else if (numero[4] == 2) {
-    p[6] = addTrain(p[6],numero[0]);
+  else if (numero[0] == 2)
+  {
+    p[6] = addTrain(p[6],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
     p[6] = removeTrain(p[6]);
   }
+  else
+  {
+    printf("probleme fonc est");
+  }
+
   printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
-  pthread_cond_signal(&superviseur);
+
   pthread_mutex_unlock(&mutex);
+  sleep(2);
+  pthread_cond_signal(&superviseur);
+  printf("appel sup\n");
   return 0;
 
 }
@@ -191,24 +201,24 @@ void* fonc_A(void* arg)
 
   pthread_mutex_lock (&mutex);
 
-  p[0] = addTrain(p[0],numero[0]);
+  p[0] = addTrain(p[0],numero[3]);
   pthread_cond_wait(&LA,&mutex);
   p[0] = removeTrain(p[0]);
   printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);
-  if (numero[0] == 0) {
-    p[3] = addTrain(p[3],numero[4]);
+  if (numero[0] == 1) {
+    p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
     p[3] = removeTrain(p[3]);
   }
-  else if (numero[0] ==1) {
-    p[4] = addTrain(p[4],numero[0]);
+  else if (numero[0] == 3) {
+    p[4] = addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
     p[4] = removeTrain(p[4]);
   }
   else if (numero[0] == 2) {
-    p[6] = addTrain(p[6],numero[4]);
+    p[6] = addTrain(p[6],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
     p[6] = removeTrain(p[6]);
@@ -231,15 +241,16 @@ void* fonc_C(void* arg)
   pthread_mutex_lock (&mutex);
   p[1] = addTrain(p[1],numero[3]);
   pthread_cond_wait(&LA,&mutex);
-  p[0] = removeTrain(p[0]);
+  p[1] = removeTrain(p[1]);
+
   printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);
-  if (numero[0] == 0) /*TGV*/ {
+  if (numero[0] == 1) /*TGV*/ {
     p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
     p[3] = removeTrain(p[3]);
   }
-  else if (numero[0] ==1) /*M */{
+  else if (numero[0] == 3) /*M */{
     p[4] = addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
@@ -250,6 +261,10 @@ void* fonc_C(void* arg)
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
     p[6] = removeTrain(p[6]);
+  }
+  else
+  {
+    printf("prob fonc c\n");
   }
   printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
   pthread_cond_signal(&superviseur);
