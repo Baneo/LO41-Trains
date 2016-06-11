@@ -183,7 +183,7 @@ void* fonc_EST(int* arg)
   pthread_mutex_unlock(&mutex);
   sleep(2);
   pthread_cond_signal(&superviseur);
-  printf("appel sup\n");
+
   return 0;
 
 }
@@ -240,7 +240,7 @@ void* fonc_C(void* arg)
 
   pthread_mutex_lock (&mutex);
   p[1] = addTrain(p[1],numero[3]);
-  pthread_cond_wait(&LA,&mutex);
+  pthread_cond_wait(&LC,&mutex);
   p[1] = removeTrain(p[1]);
 
   printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);
@@ -281,30 +281,37 @@ void* fonc_S()
 
       if(p[2].head != NULL)
       {
+        printf("SUP1\n");
         pthread_cond_signal(&LEST);
       }
       else if(p[3].head != NULL)
       {
+        printf("SUP2\n");
           pthread_cond_signal(&ATGV);
       }
       else if(p[6].head != NULL)
       {
+        printf("SUP3\n");
         pthread_cond_signal(&AGL);
       }
       else if(p[0].head != NULL)
       {
+        printf("SUP4\n");
         pthread_cond_signal(&LA);
       }
       else if(p[1].head != NULL)
       {
+        printf("SUP5\n");
         pthread_cond_signal(&LC);
       }
       else if(p[4].head != NULL)
       {
+        printf("SUP6\n");
         pthread_cond_signal(&AM1);
       }
       else if(p[5].head != NULL)
       {
+        printf("SUP7\n");
         pthread_cond_signal(&AM2);
       }
       else
