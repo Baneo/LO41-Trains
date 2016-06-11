@@ -35,7 +35,7 @@ typedef struct {
     int length;
 }FileTrain;
 
-FileTrain p[6];
+FileTrain p[7];
 
 /* Function createTrainLine
 *
@@ -298,7 +298,6 @@ void* fonc_S()
       else if(p[6].head != NULL)
       {
         printf("SUP3\n");
-        PrintTrainLine(p[6]);
         pthread_cond_signal(&AGL);
       }
       else if(p[0].head != NULL)
@@ -376,6 +375,7 @@ int main(void)
     p[l] = createFileTrain();
   }
 
+  PrintTrainLine(p[6]);
 
 
 
