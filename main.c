@@ -251,6 +251,7 @@ void* fonc_C(void* arg)
     p[3] = removeTrain(p[3]);
   }
   else if (numero[0] == 3) /*M */{
+    printf("FONC C - M");
     p[4] = addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
@@ -316,7 +317,8 @@ void* fonc_S()
       }
       else
       {
-        printf("Pas de solution kek\n");
+        printf("Tous les trains sont passés !\n");
+        return EXIT_SUCCESS;
       }
     }
 }
@@ -532,7 +534,7 @@ signal(SIGTSTP,traitantSIGTSTP);
   {
       pthread_join(tid[number],NULL);
   }
-
+  printf("FIN DU PROGRAMME !");
   shmctl(shmid, IPC_RMID, NULL);
   return EXIT_SUCCESS;
 }
