@@ -179,28 +179,28 @@ void* fonc_A(void* arg)
   }
 
   pthread_mutex_lock (&mutex);
-  /*
+
   addTrain(p[0],numero[0]);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);/*
-  if (numero[4] == 0) TGV {
-    addTrain(p[3],numero[0]);
+  printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);
+  if (numero[0] == 0) {
+    addTrain(p[3],numero[4]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) M {
+  else if (numero[0] ==1) {
     addTrain(p[4],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4] == 2) GL {
-    addTrain(p[6],numero[0]);
+  else if (numero[0] == 2) {
+    addTrain(p[6],numero[4]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }*/
+  }
   printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
-  /*pthread_mutex_unlock(&mutex);*/
+  pthread_mutex_unlock(&mutex);
     return 0;
 
 }
