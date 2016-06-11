@@ -399,8 +399,6 @@ signal(SIGTSTP,traitantSIGTSTP);
 
 
   /*boucle de création du thread en fonction de la zone de départ*/
-  for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
-  {
     for (i = 0; i < size; i++)
     {
       printf("bonjour de debut de for!!\n");
@@ -423,14 +421,14 @@ signal(SIGTSTP,traitantSIGTSTP);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
             printf("bonjour0\n");
-        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) i))
+        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,NULL)
         {
     	     perror("erreur pthread_create est");
     	     return EXIT_FAILURE;
         }*/
       }
 
-      if (output[i][1] == 1)
+      else if (output[i][1] == 1)
       {
         printf("bonjour1\n");
         for(j = 1; j < 4; j++)
@@ -448,11 +446,11 @@ signal(SIGTSTP,traitantSIGTSTP);
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-        if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
+        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
         {
     	     perror ("erreur pthread_create A");
     	     return EXIT_FAILURE;
-        }
+        }*/
       }
 
       else if (output[i][1] == 3)
@@ -474,24 +472,22 @@ signal(SIGTSTP,traitantSIGTSTP);
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-        if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
+        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
         {
     	     perror(" erreur pthread_create C");
     	     return EXIT_FAILURE;
-        }
+        }*/
 
       }
-
-    }
   }
 
 
 
-  if(!pthread_create(tid+number+1,0,(void*(*)())fonc_S,NULL))
+/*  if(!pthread_create(tid+number+1,0,(void*(*)())fonc_S,NULL))
   {
     perror("superviseur_thread_creation");
     return EXIT_FAILURE;
-  }
+  }*/
 
   for(number = 0;number < Nb_EST + Nb_A + Nb_C + 1;number ++)
   {
