@@ -137,28 +137,29 @@ void* fonc_EST(void* arg)
   {
     printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
   }
+
   pthread_mutex_lock (&mutex);
   printf("Le Train Préviens le Chef qu'il est la.");
-  addTrain(p[2],numero[0]);
+  /*addTrain(p[2],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LEST,&mutex);
   removeTrain(p[2]);
-  printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[0]);
-  if (numero[4] == 0) /*TGV*/ {
+  */printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[0]);/*
+  if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) /*M*/ {
+  else if (numero[4] ==1) {
     addTrain(p[5],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4] == 2) /*GL*/ {
+  else if (numero[4] == 2) {
     addTrain(p[6],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }
+  }*/
   printf("Le Train part vers sa destination finale.\n");
   pthread_mutex_unlock(&mutex);
   return 0;
@@ -230,6 +231,12 @@ void* fonc_C(void* arg)
   }
   printf("Le Train part vers sa destination finale.\n");
   pthread_mutex_unlock(&mutex);
+  return 0;
+}
+
+void* fonc_S()
+{
+  printf("Supervisor here\n");
   return 0;
 }
 
@@ -479,9 +486,15 @@ signal(SIGTSTP,traitantSIGTSTP);
 	     perror("pthread_create");
 	     return EXIT_FAILURE;
     }
+
+  }
+  if(!pthread_create(tid+number+1,0,(void*(*)())fonc_S,NULL))
+  {
+    perror("superviseur_thread_creation");
+    return EXIT_FAILURE;
   }
 
-  for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
+  for(number = 0;number < Nb_EST + Nb_A + Nb_C + 1;number ++)
   {
       pthread_join(tid[number],NULL);
   }
