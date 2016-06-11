@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-pthread_t tid[60];
+pthread_t tid[4];
 pthread_mutex_t mutex;
 pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
@@ -241,8 +241,8 @@ void* fonc_C(void* arg)
 
 void* fonc_S()
 {
-  printf("Supervisor here\n");
-  return 0;
+      printf("Supervisor here\n");
+      return 0;
 }
 
 /*Fonctions ruling the Signals*/
@@ -421,11 +421,12 @@ signal(SIGTSTP,traitantSIGTSTP);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
             printf("bonjour0\n");
-        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,NULL)
+        i = pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) numero);
+        if(i == 1)
         {
     	     perror("erreur pthread_create est");
     	     return EXIT_FAILURE;
-        }*/
+        }
       }
 
       else if (output[i][1] == 1)
@@ -445,12 +446,12 @@ signal(SIGTSTP,traitantSIGTSTP);
           }
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-
-        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
+        i = pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero);
+        if(i == 0)
         {
     	     perror ("erreur pthread_create A");
     	     return EXIT_FAILURE;
-        }*/
+        }
       }
 
       else if (output[i][1] == 3)
@@ -472,22 +473,23 @@ signal(SIGTSTP,traitantSIGTSTP);
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-        /*if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
+        i = pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero);
         {
+          if(i == 1)
     	     perror(" erreur pthread_create C");
     	     return EXIT_FAILURE;
-        }*/
+        }
 
       }
   }
 
 
-
-/*  if(!pthread_create(tid+number+1,0,(void*(*)())fonc_S,NULL))
-  {
-    perror("superviseur_thread_creation");
-    return EXIT_FAILURE;
-  }*/
+    i = pthread_create(tid,0,(void*(*)())fonc_S,NULL);
+    if(i == 1)
+    {
+      perror("superviseur_thread_creation");
+      return EXIT_FAILURE;
+    }
 
   for(number = 0;number < Nb_EST + Nb_A + Nb_C + 1;number ++)
   {
