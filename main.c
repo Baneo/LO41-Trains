@@ -129,10 +129,15 @@ void PrintTrainLine(FileTrain t)
 {
   int i;
   Element* m = t.head;
+  if (t.length != 0){
   for (i = 0; i < t.length; i++) {
     printf("Le train numéro %d est le train %d\n",i+1,m->train);
     m=m->next;
   }
+}
+  else
+  { printf("elle est vide ta file, andouille.");
+}
 }
 
 
@@ -293,6 +298,7 @@ void* fonc_S()
       else if(p[6].head != NULL)
       {
         printf("SUP3\n");
+        PrintTrainLine(p[6]);
         pthread_cond_signal(&AGL);
       }
       else if(p[0].head != NULL)
@@ -534,6 +540,7 @@ signal(SIGTSTP,traitantSIGTSTP);
   {
       pthread_join(tid[number],NULL);
   }
+  PrintTrainLine(p[6]);
   printf("FIN DU PROGRAMME !");
   shmctl(shmid, IPC_RMID, NULL);
   return EXIT_SUCCESS;
