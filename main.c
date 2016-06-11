@@ -17,7 +17,8 @@ pthread_t tid[60];
 pthread_mutex_t mutex;
 pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
-int shmid, i;
+int shmid;
+
 int print_full_info = 1;
 
 typedef struct elem{
@@ -30,7 +31,7 @@ typedef struct {
     int length;
 }FileTrain;
 
-FileTrain *p;
+FileTrain p[6];
 
 /* Function createTrainLine
 *
@@ -61,13 +62,13 @@ return F;
 FileTrain addTrain(FileTrain f, int t)
 {
   int i;
-	 Element* newElem = (Element*)malloc(sizeof(Element));
-	 newElem -> train = t;
+  Element* newElem = (Element*)malloc(sizeof(Element));
+  newElem -> train = t;
     if (f.length == 0)
     {
-	    newElem -> next = NULL;
-	    f.head = newElem;
-		  f.length = 1;
+     newElem -> next = NULL;
+     f.head = newElem;
+     f.length = 1;
     }
     else
     {   newElem->next = f.head;
@@ -76,7 +77,7 @@ FileTrain addTrain(FileTrain f, int t)
         }
     newElem->next->next = newElem;
     newElem->next = NULL;
-		f.length = f.length + 1;
+   f.length = f.length + 1;
     }
 
 return f;
@@ -103,11 +104,12 @@ FileTrain removeTrain(FileTrain t)
         t.head = NULL;
         return t;
     }
-	 else
+  else
         {
-		  m -> next -> next = m -> next;
-		  free(m);
+     m -> next -> next = m -> next;
         t.length = t.length - 1;
+        t.head = m->next;
+        free(m);
 
     }
 return t;
@@ -124,11 +126,10 @@ void PrintTrainLine(FileTrain t)
   int i;
   Element* m = t.head;
   for (i = 0; i < t.length; i++) {
-    printf("Le train numéro %d est le train %d",i+1,m->train);
+    printf("Le train numéro %d est le train %d\n",i+1,m->train);
     m=m->next;
   }
 }
-
 
 void* fonc_EST(void* arg)
 {
@@ -492,17 +493,6 @@ signal(SIGTSTP,traitantSIGTSTP);
       pthread_join(tid[number],NULL);
   }
 
-  /*
-  shmid = shmget(IPC_PRIVATE, sizeof(FileTrain), 0666);
-  p = (FileTrain *)shmat(shmid, NULL, 0);
-  FT1 = createFileTrain();
-  printf("FileTrain Crée");
-  FT1 = addTrain(FT1, 12);
-  FT1 = addTrain(FT1, 15);
-  FT1 = addTrain(FT1, 18);
-  PrintTrainLine(FT1);
-  FT1 = removeTrain(FT1);
-  PrintTrainLine(FT1);*/
   shmctl(shmid, IPC_RMID, NULL);
   return EXIT_SUCCESS;
 }
