@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define nbThreads 5
+#define nbThreads 15
 
 pthread_t tid[nbThreads];
 pthread_mutex_t mutex;
@@ -166,10 +166,10 @@ void* fonc_EST(int* arg)
   }
   else if (numero[0] == 3)
   {
-    p[5] = addTrain(p[5],numero[3]);
+    p[4] = addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
-    p[5] = removeTrain(p[5]);
+    p[4] = removeTrain(p[4]);
   }
   else if (numero[0] == 2)
   {
@@ -205,7 +205,6 @@ void* fonc_A(void* arg)
   }
 
   pthread_mutex_lock (&mutex);
-
   p[0] = addTrain(p[0],numero[3]);
   pthread_cond_wait(&LA,&mutex);
   p[0] = removeTrain(p[0]);
@@ -217,10 +216,10 @@ void* fonc_A(void* arg)
     p[3] = removeTrain(p[3]);
   }
   else if (numero[0] == 3) {
-    p[4] = addTrain(p[4],numero[3]);
+    p[5] = addTrain(p[5],numero[3]);
     pthread_cond_signal(&superviseur);
-    pthread_cond_wait(&AM1, &mutex);
-    p[4] = removeTrain(p[4]);
+    pthread_cond_wait(&AM2, &mutex);
+    p[5] = removeTrain(p[5]);
   }
   else if (numero[0] == 2) {
     p[6] = addTrain(p[6],numero[3]);
@@ -257,10 +256,10 @@ void* fonc_C(void* arg)
   }
   else if (numero[0] == 3) /*M */{
     printf("FONC C - M");
-    p[4] = addTrain(p[4],numero[3]);
+    p[5] = addTrain(p[5],numero[3]);
     pthread_cond_signal(&superviseur);
-    pthread_cond_wait(&AM1, &mutex);
-    p[4] = removeTrain(p[4]);
+    pthread_cond_wait(&AM2, &mutex);
+    p[5] = removeTrain(p[5]);
   }
   else if (numero[0] == 2) /*GL*/ {
     p[6] = addTrain(p[6],numero[3]);
@@ -287,36 +286,43 @@ void* fonc_S()
 
       if(p[2].head != NULL)
       {
+        PrintTrainLine(p[2]);
         printf("SUP1\n");
         pthread_cond_signal(&LEST);
       }
       else if(p[3].head != NULL)
       {
+        PrintTrainLine(p[3]);
         printf("SUP2\n");
           pthread_cond_signal(&ATGV);
       }
       else if(p[6].head != NULL)
       {
+        PrintTrainLine(p[6]);
         printf("SUP3\n");
         pthread_cond_signal(&AGL);
       }
       else if(p[0].head != NULL)
       {
+        PrintTrainLine(p[0]);
         printf("SUP4\n");
         pthread_cond_signal(&LA);
       }
       else if(p[1].head != NULL)
       {
+        PrintTrainLine(p[1]);
         printf("SUP5\n");
         pthread_cond_signal(&LC);
       }
       else if(p[4].head != NULL)
       {
+              PrintTrainLine(p[4]);
         printf("SUP6\n");
         pthread_cond_signal(&AM1);
       }
       else if(p[5].head != NULL)
       {
+          PrintTrainLine(p[5]);
         printf("SUP7\n");
         pthread_cond_signal(&AM2);
       }
@@ -374,12 +380,6 @@ int main(void)
   {
     p[l] = createFileTrain();
   }
-
-  PrintTrainLine(p[6]);
-
-
-
-
 /*Handler signaux*/
 
 signal(SIGINT,traitantSIGINT);
