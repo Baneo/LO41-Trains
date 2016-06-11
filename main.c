@@ -13,7 +13,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-pthread_t tid[4];
+#define nbThreads 5
+
+pthread_t tid[nbThreads];
 pthread_mutex_t mutex;
 pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
@@ -218,7 +220,7 @@ void* fonc_C(void* arg)
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
+  */printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
   /*if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
@@ -277,7 +279,7 @@ void traitantSIGTSTP(int num) {
 int main(void)
 {
   /*variables utiles au développement du programme*/
-  int i = 0, k=0, j = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+  int i = 0, k=0, j = 0, o = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
   /*variable utilisées pour les buffers de lecture du fichier*/
   char file_name[100];
   char line[128];
@@ -421,12 +423,9 @@ signal(SIGTSTP,traitantSIGTSTP);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
             printf("bonjour0\n");
-        i = pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) numero);
-        if(i == 1)
-        {
-    	     perror("erreur pthread_create est");
-    	     return EXIT_FAILURE;
-        }
+            printf("o = %d\n", o);
+            pthread_create(tid+o,0,(void*(*)())fonc_EST,(void*) numero);
+            o++;
       }
 
       else if (output[i][1] == 1)
@@ -446,12 +445,8 @@ signal(SIGTSTP,traitantSIGTSTP);
           }
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-        i = pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero);
-        if(i == 0)
-        {
-    	     perror ("erreur pthread_create A");
-    	     return EXIT_FAILURE;
-        }
+        pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) numero);
+            o++;
       }
 
       else if (output[i][1] == 3)
@@ -471,20 +466,16 @@ signal(SIGTSTP,traitantSIGTSTP);
             printf("contenu de numero, case %d :%d\n", k, numero[k]);
           }
         }
+        printf("o = %d\n", o);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-
-        i = pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero);
-        {
-          if(i == 1)
-    	     perror(" erreur pthread_create C");
-    	     return EXIT_FAILURE;
-        }
-
+        pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) numero);
+        printf("Bonjour3:3\n");
+        o++;
       }
   }
 
 
-    i = pthread_create(tid,0,(void*(*)())fonc_S,NULL);
+    i = pthread_create(tid+nbThreads,0,(void*(*)())fonc_S,NULL);
     if(i == 1)
     {
       perror("superviseur_thread_creation");
