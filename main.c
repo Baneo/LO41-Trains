@@ -19,6 +19,8 @@ pthread_t tid[nbThreads];
 pthread_mutex_t mutex;
 pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
+
+
 int shmid;
 
 int print_full_info = 1;
@@ -136,11 +138,11 @@ void PrintTrainLine(FileTrain t)
 void* fonc_EST(int* arg)
 {
   int *numero = (int*)arg;
-  printf("Ca passe bien la");
+  printf("Ca passe bien la\n");
   if(print_full_info == 1)
   {
-    printf("Ca passe bien la");
-    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
+    printf("Ca passe bien la\n");
+    printf("valeur du tableau passé en argument(EST): type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
   }
 
   /*pthread_mutex_lock (&mutex);*/
@@ -175,7 +177,7 @@ void* fonc_A(void* arg)
   int *numero = (int*)arg;
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
+    printf("valeur du tableau passé en argument: type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
   }
   /*
   pthread_mutex_lock (&mutex);
@@ -211,7 +213,7 @@ void* fonc_C(void* arg)
 
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
+    printf("valeur du tableau passé en argument: type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2]);
   }
   /*
   pthread_mutex_lock (&mutex);
@@ -312,7 +314,8 @@ signal(SIGTSTP,traitantSIGTSTP);
 
   /*allocation de l'espace pour le tableau output*/
   output = malloc (size * sizeof (int *));
-  for (x = 0;x < 3;x ++)
+
+  for (x = 0;x < size;x ++)
   {
     output[x] = malloc (3 * sizeof (int));
   }
@@ -424,7 +427,7 @@ signal(SIGTSTP,traitantSIGTSTP);
 
             printf("bonjour0\n");
             printf("o = %d\n", o);
-            pthread_create(tid+o,0,(void*(*)())fonc_EST,(void*) numero);
+            pthread_create(tid+o,0,(void*(*)())fonc_EST,(void*) output[i]);
             o++;
       }
 
@@ -441,11 +444,11 @@ signal(SIGTSTP,traitantSIGTSTP);
         {
           for (k = 0; k < 4 ; k++)
           {
-            printf("contenu de numero, case %d :%d\n", k, numero[k]);
+            printf("contenu de numero, case %d :%d\n", k, numero[i]);
           }
         }
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-        pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) numero);
+        pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) output[i]);
             o++;
       }
 
@@ -463,12 +466,12 @@ signal(SIGTSTP,traitantSIGTSTP);
         {
           for (k = 0; k < 4 ; k++)
           {
-            printf("contenu de numero, case %d :%d\n", k, numero[k]);
+            printf("contenu de numero, case %d :%d\n", k, numero[i]);
           }
         }
         printf("o = %d\n", o);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-        pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) numero);
+        pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) output[i]);
         printf("Bonjour3:3\n");
         o++;
       }
