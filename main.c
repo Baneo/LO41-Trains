@@ -135,11 +135,11 @@ void* fonc_EST(void* arg)
   int *numero = (int*)arg;
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
   }
 
-  pthread_mutex_lock (&mutex);
-  printf("Le Train Préviens le Chef qu'il est la.");
+  /*pthread_mutex_lock (&mutex);*/
+  printf("Le Train no %d previent le superviseur qu'il est la.", numero[0]);
   /*addTrain(p[2],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LEST,&mutex);
@@ -160,8 +160,8 @@ void* fonc_EST(void* arg)
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
   }*/
-  printf("Le Train part vers sa destination finale.\n");
-  pthread_mutex_unlock(&mutex);
+  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  /*pthread_mutex_unlock(&mutex);*/
   return 0;
 
 }
@@ -170,67 +170,69 @@ void* fonc_A(void* arg)
   int *numero = (int*)arg;
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
-
+    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
   }
+  /*
   pthread_mutex_lock (&mutex);
-  printf("Le Train Préviens le Chef qu'il est la.");
+  */printf("Le Train no %d previent le superviseur qu'il est la.", numero[0]);/*
   addTrain(p[0],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
-  if (numero[4] == 0) /*TGV*/ {
+  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.", numero[0]);/*
+  if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) /*M*/ {
+  else if (numero[4] ==1) M* {
     addTrain(p[4],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4] == 2) /*GL*/ {
+  else if (numero[4] == 2) GL {
     addTrain(p[6],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }
-  printf("Le Train part vers sa destination finale.\n");
-  pthread_mutex_unlock(&mutex);
-  return 0;
+  }*/
+  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  /*pthread_mutex_unlock(&mutex);*/
+    return 0;
 
 }
 void* fonc_C(void* arg)
 {
   int *numero = (int*)arg;
+
   if(print_full_info == 1)
   {
-    printf("valeur du tableau passé en argument: %d \n %d \n %d \n", numero[0], numero[1], numero[2]);
+    printf("valeur du tableau passé en argument: no:%d \n type:%d \n dpt:%d \n arr:%d\n", numero[0], numero[1], numero[2], numero[3]);
   }
+  /*
   pthread_mutex_lock (&mutex);
-  printf("Le Train Préviens le Chef qu'il est la.");
+  */printf("Le Train Préviens le Chef qu'il est la.");/*
   addTrain(p[1],numero[0]);
   pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
-  if (numero[4] == 0) /*TGV*/ {
+  */printf("le train %d l'aiguillage, et arrive dans la voie de Garage.", numero[0]);
+  /*if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) /*M*/ {
+  else if (numero[4] ==1) M {
     addTrain(p[4],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4] == 2) /*GL*/ {
+  else if (numero[4] == 2) GL {
     addTrain(p[6],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }
-  printf("Le Train part vers sa destination finale.\n");
-  pthread_mutex_unlock(&mutex);
+  }*/
+  printf("Le Train no %d part vers sa destination finale.\n", numero[0]);
+  /*pthread_mutex_unlock(&mutex);*/
   return 0;
 }
 
@@ -394,100 +396,91 @@ signal(SIGTSTP,traitantSIGTSTP);
 
 
   /*boucle de création du thread en fonction de la zone de départ*/
-  for(number = 0;number < Nb_EST;number ++)
-
+  for(number = 0;number < Nb_EST + Nb_A + Nb_C;number ++)
   {
     for (i = 0; i < size; i++)
     {
       if (output[i][1] == 5)
       {
 
-        for(j = 0; j < 3; j++)
+        for(j = 1; j < 4; j++)
         {
-          numero[j] = output[i][j];
+          numero[j] = output[i][j-1];
+        }
+        numero[0] = i+1;
+        /*verification du contenu avant de le passer au thread*/
+        if(print_full_info == 1)
+        {
+          for (i = 0; i < 4 ; i++)
+          {
+            printf("contenu de numero, case %d :%d\n", i, numero[i]);
+          }
+        }
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+
+        if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) numero))
+        {
+    	     perror("erreur pthread_create est");
+    	     return EXIT_FAILURE;
         }
       }
-    }
-    /*verification du contenu avant de le passer au thread*/
-    if(print_full_info == 1)
-    {
-      for (i = 0; i < 3 ; i++)
-      {
-        printf("contenu de numero, case %d :%d\n", i, numero[i]);
-      }
-    }
-    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-    if(!pthread_create(tid+number,0,(void*(*)())fonc_EST,(void*) numero))
-    {
-	     perror("pthread_create");
-	     return EXIT_FAILURE;
-    }
-
-  }
-
-  for(number = number;number < Nb_A + Nb_EST;number ++)
-  {
-
-    for (i = 0; i < size; i++)
-    {
       if (output[i][1] == 1)
       {
 
-        for(j = 0; j < 3; j++)
+        for(j = 1; j < 4; j++)
         {
-          numero[j] = output[i][j];
+          numero[j] = output[i][j-1];
+        }
+        numero[0] = i+1;
+        /*verification du contenu avant de le passer au thread*/
+        if(print_full_info == 1)
+        {
+          for (i = 0; i < 4 ; i++)
+          {
+            printf("contenu de numero, case %d :%d\n", i, numero[i]);
+          }
+        }
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+
+        if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
+        {
+    	     perror("erreur pthread_create A");
+    	     return EXIT_FAILURE;
         }
       }
-    }
-    /*verification du contenu avant de le passer au thread*/
-    if(print_full_info == 1)
-    {
-      for (i = 0; i < 3 ; i++)
-      {
-        printf("contenu de numero, case %d :%d\n", i, numero[i]);
-      }
-    }
-    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-    if(!pthread_create(tid+number,0,(void*(*)())fonc_A,(void*) numero))
-    {
-	     perror("pthread_create");
-	     return EXIT_FAILURE;
-    }
-  }
-
-  for(number = number;number < Nb_C + Nb_A + Nb_EST;number ++)
-  {
-
-    for (i = 0; i < size; i++)
-    {
       if (output[i][1] == 3)
       {
 
-        for(j = 0; j < 3; j++)
+        for(j = 1; j < 4; j++)
         {
-          numero[j] = output[i][j];
+          numero[j] = output[i][j-1];
         }
-      }
-    }
-    /*verification du contenu avant de le passer au thread*/
-    if(print_full_info == 1)
-    {
-      for (i = 0; i < 3 ; i++)
-      {
-        printf("contenu de numero, case %d :%d\n", i, numero[i]);
-      }
-    }
-    /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
+        numero[0] = i+1;
+        /*verification du contenu avant de le passer au thread*/
+        if(print_full_info == 1)
+        {
+          for (i = 0; i < 4 ; i++)
+          {
+            printf("contenu de numero, case %d :%d\n", i, numero[i]);
+          }
+        }
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
 
-    if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
-    {
-	     perror("pthread_create");
-	     return EXIT_FAILURE;
-    }
+        if(!pthread_create(tid+number,0,(void*(*)())fonc_C,(void*) numero))
+        {
+    	     perror(" erreur pthread_create C");
+    	     return EXIT_FAILURE;
+        }
 
+      }
+
+    }
   }
+
+
+
   if(!pthread_create(tid+number+1,0,(void*(*)())fonc_S,NULL))
   {
     perror("superviseur_thread_creation");
