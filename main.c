@@ -145,14 +145,12 @@ void* fonc_EST(int* arg)
     printf("valeur du tableau passé en argument(EST):no%d\n type:%d \n dpt:%d \n arr:%d\n",numero[3], numero[0], numero[1], numero[2]);
   }
 
-  /*pthread_mutex_lock (&mutex);*/
-  printf("Le Train no %d previent le superviseur qu'il est la.", numero[3]);
-  /*addTrain(p[2],numero[0]);
-  pthread_cond_signal(&superviseur);
+  pthread_mutex_lock (&mutex);
+  addTrain(p[2],numero[0]);
   pthread_cond_wait(&LEST,&mutex);
   removeTrain(p[2]);
-  */printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.", numero[3]);/*
-  if (numero[4] == 0) TGV {
+  printf("le train %d passe le Tunnel, et arrive dans la voie de Garage.\n", numero[3]);
+  if (numero[4] == 0){
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
@@ -166,9 +164,9 @@ void* fonc_EST(int* arg)
     addTrain(p[6],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }*/
+  }
   printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
-  /*pthread_mutex_unlock(&mutex);*/
+  pthread_mutex_unlock(&mutex);
   return 0;
 
 }
@@ -179,20 +177,19 @@ void* fonc_A(void* arg)
   {
     printf("valeur du tableau passé en argument:no%d\n type:%d \n dpt:%d \n arr:%d\n",numero[3], numero[0], numero[1], numero[2]);
   }
-  /*
+
   pthread_mutex_lock (&mutex);
-  */printf("Le Train no %d previent le superviseur qu'il est la.", numero[3]);/*
+  /*
   addTrain(p[0],numero[0]);
-  pthread_cond_signal(&superviseur);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.", numero[3]);/*
+  */printf("le train %d a passé l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);/*
   if (numero[4] == 0) TGV {
     addTrain(p[3],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) M* {
+  else if (numero[4] ==1) M {
     addTrain(p[4],numero[0]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
@@ -215,38 +212,40 @@ void* fonc_C(void* arg)
   {
     printf("valeur du tableau passé en argument: no: %d type:%d \n dpt:%d \n arr:%d\n", numero[3], numero[0], numero[1], numero[2]);
   }
-  /*
+
   pthread_mutex_lock (&mutex);
-  */printf("Le Train Préviens le Chef qu'il est la.");/*
-  addTrain(p[1],numero[0]);
-  pthread_cond_signal(&superviseur);
+  addTrain(p[1],numero[3]);
   pthread_cond_wait(&LA,&mutex);
   removeTrain(p[0]);
-  */printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.", numero[3]);
-  /*if (numero[4] == 0) TGV {
-    addTrain(p[3],numero[0]);
+  printf("le train %d passes l'aiguillage, et arrive dans la voie de Garage.\n", numero[3]);
+  if (numero[0] == 0) /*TGV*/ {
+    addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
   }
-  else if (numero[4] ==1) M {
-    addTrain(p[4],numero[0]);
+  else if (numero[0] ==1) /*M */{
+    addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
   }
-  else if (numero[4] == 2) GL {
-    addTrain(p[6],numero[0]);
+  else if (numero[0] == 2) /*GL*/ {
+    addTrain(p[6],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
-  }*/
+  }
   printf("Le Train no %d part vers sa destination finale.\n", numero[3]);
-  /*pthread_mutex_unlock(&mutex);*/
+  pthread_mutex_unlock(&mutex);
   return 0;
 }
 
 void* fonc_S()
 {
+  while (1){
+      pthread_cond_wait(&superviseur, &mutex);
       printf("Supervisor here\n");
-      return 0;
+      pthread_cond_signal(&LEST);
+      pthread_cond_signal(&ATGV);
+    }
 }
 
 /*Fonctions ruling the Signals*/
@@ -258,10 +257,10 @@ void erreur(const char* msg) {
   }
 
 void traitantSIGINT(int num) {
-   if (num!=SIGTSTP){
+   if (num!=SIGINT){
      erreur("Pb sur SigInt...");
    }
-  printf("\n---- Suppression des tables IPC-----\n");
+  printf("\n---- Suppression des tables IPC123-----\n");
   shmctl(shmid, IPC_RMID, NULL);
   signal(SIGINT,SIG_DFL);
   kill(getpid(),SIGINT);
@@ -270,11 +269,13 @@ void traitantSIGINT(int num) {
 void traitantSIGTSTP(int num) {
  if (num!=SIGTSTP){
    erreur("Pb sur SigSTP...");
- }
+ }/*
     printf("\n---- Suppression des tables IPC-----\n");
     shmctl(shmid, IPC_RMID, NULL);
     signal(SIGTSTP,SIG_DFL);
-    kill(getpid(),SIGTSTP);
+    kill(getpid(),SIGTSTP);*/
+pthread_cond_signal(&superviseur);
+
   }
 
 
@@ -288,7 +289,7 @@ int main(void)
   /*variable d'entrée de la lecture du fichier et variable de sortie avec toutes les informations nécéssaires*/
   FILE* input;
   int ** output;
-  
+
 
 /*Handler signaux*/
 
@@ -405,21 +406,16 @@ signal(SIGTSTP,traitantSIGTSTP);
   /*boucle de création du thread en fonction de la zone de départ*/
     for (i = 0; i < size; i++)
     {
-      printf("bonjour de debut de for!!\n");
       if (output[i][1] == 5)
       {
         output[i][3] = i+1;
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-
-            printf("bonjour0\n");
-            printf("o = %d\n", o);
             pthread_create(tid+o,0,(void*(*)())fonc_EST,(void*) output[i]);
             o++;
       }
 
       else if (output[i][1] == 1)
       {
-        printf("bonjour1\n");
         output[i][3] = i+1;
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
         pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) output[i]);
@@ -428,14 +424,9 @@ signal(SIGTSTP,traitantSIGTSTP);
 
       else if (output[i][1] == 3)
       {
-            printf("bonjour2\n");
-
-
         output[i][3] = i+1;
-        printf("o = %d\n", o);
         /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
         pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) output[i]);
-        printf("Bonjour3:3\n");
         o++;
       }
   }
@@ -447,6 +438,14 @@ signal(SIGTSTP,traitantSIGTSTP);
       perror("superviseur_thread_creation");
       return EXIT_FAILURE;
     }
+
+  printf("Avant attente\n");
+  sleep(2000);
+  printf("Après attente\n");
+  pthread_cond_signal(&superviseur);
+
+
+
 
   for(number = 0;number < Nb_EST + Nb_A + Nb_C + 1;number ++)
   {
