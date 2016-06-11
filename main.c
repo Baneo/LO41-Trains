@@ -110,11 +110,10 @@ FileTrain removeTrain(FileTrain t)
     }
   else
         {
-     m -> next -> next = m -> next;
+        t.head = t.head ->next;
         t.length = t.length - 1;
-        t.head = m->next;
         free(m);
-
+        m=NULL;
     }
 return t;
 }
