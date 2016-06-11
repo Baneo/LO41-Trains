@@ -241,10 +241,42 @@ void* fonc_C(void* arg)
 void* fonc_S()
 {
   while (1){
+      printf("attente superviseur\n");
       pthread_cond_wait(&superviseur, &mutex);
       printf("Supervisor here\n");
-      pthread_cond_signal(&LEST);
-      pthread_cond_signal(&ATGV);
+      printf("p2 head : %d", p[2].head->train);
+      if(p[2].head != NULL)
+      {
+        pthread_cond_signal(&LEST);
+      }
+      else if(p[3].head != NULL)
+      {
+          pthread_cond_signal(&ATGV);
+      }
+      else if(p[6].head != NULL)
+      {
+        pthread_cond_signal(&AGL);
+      }
+      else if(p[0].head != NULL)
+      {
+        pthread_cond_signal(&LA);
+      }
+      else if(p[1].head != NULL)
+      {
+        pthread_cond_signal(&LC);
+      }
+      else if(p[4].head != NULL)
+      {
+        pthread_cond_signal(&AM1);
+      }
+      else if(p[5].head != NULL)
+      {
+        pthread_cond_signal(&AM2);
+      }
+      else
+      {
+        printf("Pas de solution kek\n");
+      }
     }
 }
 
@@ -282,13 +314,18 @@ pthread_cond_signal(&superviseur);
 int main(void)
 {
   /*variables utiles au développement du programme*/
-  int i = 0, j = 0, o = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+  int i = 0, j = 0, o = 0,l, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
   /*variable utilisées pour les buffers de lecture du fichier*/
   char file_name[100];
   char line[128];
   /*variable d'entrée de la lecture du fichier et variable de sortie avec toutes les informations nécéssaires*/
   FILE* input;
   int ** output;
+
+  for (l = 0;l<7;l++)
+  {
+    p[l] = createFileTrain();
+  }
 
 
 /*Handler signaux*/
