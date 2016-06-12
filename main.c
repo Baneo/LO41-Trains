@@ -358,22 +358,25 @@ void traitantSIGTSTP(int num) {
 int main(void)
 {
   /*variables utiles au développement du programme*/
-  int i = 0, j = 0, o = 0,l, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+  int i = 0, j = 0, numtid = 0,nb_files = 0, number = 0, count = 0,x, Nb_A = 0, Nb_C = 0, Nb_EST = 0, size;
+
   /*variable utilisées pour les buffers de lecture du fichier*/
   char file_name[100];
   char line[128];
+
   /*variable d'entrée de la lecture du fichier et variable de sortie avec toutes les informations nécéssaires*/
   FILE* input;
   int ** output;
 
-  for (l = 0;l<7;l++)
+  /* création des files de trains*/
+  for (nb_files = 0;nb_files<7;nb_files++)
   {
-    p[l] = createFileTrain();
+    p[nb_files] = createFileTrain();
   }
-/*Handler signaux*/
 
-signal(SIGINT,traitantSIGINT);
-signal(SIGTSTP,traitantSIGTSTP);
+  /*Handler signaux*/
+  signal(SIGINT,traitantSIGINT);
+  signal(SIGTSTP,traitantSIGTSTP);
 
   /*récupération du nom du fichier*/
   printf("Entrez le chemin du fichier a utiliser:\n");
@@ -386,9 +389,9 @@ signal(SIGTSTP,traitantSIGTSTP);
     perror("Wrong input");
     return 1;
   }
-
+  /*lecture de la première ligne pour avoir le nombre de trains */
   fgets(line, sizeof line, input);
-  /*acquisition de la taille du tableau output*/
+  /*initialisation de la taille du tableau output*/
   size = atoi(line);
 
   /*allocation de l'espace pour le tableau output*/
@@ -402,21 +405,25 @@ signal(SIGTSTP,traitantSIGTSTP);
   /*boucle de remplisage du tableau output*/
   while(fgets(line, sizeof line, input) != NULL)
   {
+    /* si le train est un TGV*/
     if (strncmp(line, "TGV", 3) == 0)
     {
       output[number][count] = 1;
       count ++;
     }
+    /* si le train est une grande ligne*/
     else if (strncmp(line, "GL", 2) == 0)
     {
       output[number][count] = 2;
       count ++;
     }
+    /*si le train est un train de marchandises*/
     else if (strncmp(line, "M", 1) == 0)
     {
       output[number][count] = 3;
       count ++;
     }
+
     else if (strncmp(line, "EST", 3) == 0)
     {
       output[number][count] = 5;
@@ -456,8 +463,10 @@ signal(SIGTSTP,traitantSIGTSTP);
     }
     else
     {
+      /*affichage du nouveau train*/
       printf("Train number %d\n", number + 1);
     }
+    /*gestion un nombre de trains, de l'entrée et de la sortie de chaque train*/
     if (count == 3)
     {
       count = 0;
@@ -465,6 +474,7 @@ signal(SIGTSTP,traitantSIGTSTP);
     }
 
   }
+  /*fermeture du fichier*/
   fclose(input);
 
   /*vérification des informations*/
@@ -481,50 +491,50 @@ signal(SIGTSTP,traitantSIGTSTP);
     }
   }
 
-
   /*boucle de création du thread en fonction de la zone de départ*/
     for (i = 0; i < size; i++)
     {
       if (output[i][1] == 5)
       {
         output[i][3] = i+1;
-        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-            pthread_create(tid+o,0,(void*(*)())fonc_EST,(void*) output[i]);
-            o++;
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau*/
+            pthread_create(tid+numtid,0,(void*(*)())fonc_EST,(void*) output[i]);
+            numtid++;
       }
 
       else if (output[i][1] == 1)
       {
         output[i][3] = i+1;
-        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-        pthread_create(tid+o,0,(void*(*)())fonc_A,(void*) output[i]);
-            o++;
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau*/
+        pthread_create(tid+numtid,0,(void*(*)())fonc_A,(void*) output[i]);
+            numtid++;
       }
 
       else if (output[i][1] == 3)
       {
         output[i][3] = i+1;
-        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau, politique d'ordonnancement a faire ici ?*/
-        pthread_create(tid+o,0,(void*(*)())fonc_C,(void*) output[i]);
-        o++;
+        /*creation du thread, envoi du tableau par cast en void* sur le pointeur du tableau*/
+        pthread_create(tid+numtid,0,(void*(*)())fonc_C,(void*) output[i]);
+        numtid++;
       }
   }
 
-
+    /*creation du thread superviseur*/
     i = pthread_create(tid+nbThreads,0,(void*(*)())fonc_S,NULL);
     if(i == 1)
     {
       perror("superviseur_thread_creation");
       return EXIT_FAILURE;
     }
-
-  printf("Avant attente\n");
   sleep(2);
-  printf("Après attente\n");
+  printf("Trains de la voie EST:\n");
+  PrintTrainLine(p[2]);
+  printf("Trains de la voie A:\n");
+  PrintTrainLine(p[0]);
+  printf("Trains de la voie C:\n");
+  PrintTrainLine(p[1]);
+
   pthread_cond_signal(&superviseur);
-
-
-
 
   for(number = 0;number < Nb_EST + Nb_A + Nb_C + 1;number ++)
   {
