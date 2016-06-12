@@ -23,7 +23,7 @@ pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 
 int shmid;
 
-int print_full_info = 1;
+int print_full_info = 0;
 
 typedef struct elem{
     int train;
@@ -286,43 +286,36 @@ void* fonc_S()
       if(p[2].head != NULL)
       {
         PrintTrainLine(p[2]);
-        printf("SUP1\n");
         pthread_cond_signal(&LEST);
       }
       else if(p[3].head != NULL)
       {
         PrintTrainLine(p[3]);
-        printf("SUP2\n");
           pthread_cond_signal(&ATGV);
       }
       else if(p[6].head != NULL)
       {
         PrintTrainLine(p[6]);
-        printf("SUP3\n");
         pthread_cond_signal(&AGL);
       }
       else if(p[0].head != NULL)
       {
         PrintTrainLine(p[0]);
-        printf("SUP4\n");
         pthread_cond_signal(&LA);
       }
       else if(p[1].head != NULL)
       {
         PrintTrainLine(p[1]);
-        printf("SUP5\n");
         pthread_cond_signal(&LC);
       }
       else if(p[4].head != NULL)
       {
               PrintTrainLine(p[4]);
-        printf("SUP6\n");
         pthread_cond_signal(&AM1);
       }
       else if(p[5].head != NULL)
       {
           PrintTrainLine(p[5]);
-        printf("SUP7\n");
         pthread_cond_signal(&AM2);
       }
       else
@@ -354,13 +347,11 @@ void traitantSIGINT(int num) {
 void traitantSIGTSTP(int num) {
  if (num!=SIGTSTP){
    erreur("Pb sur SigSTP...");
- }/*
+ }
     printf("\n---- Suppression des tables IPC-----\n");
     shmctl(shmid, IPC_RMID, NULL);
     signal(SIGTSTP,SIG_DFL);
-    kill(getpid(),SIGTSTP);*/
-pthread_cond_signal(&superviseur);
-
+    kill(getpid(),SIGTSTP);
   }
 
 
