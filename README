@@ -1,0 +1,50 @@
+----- INSTRUCTIONS POUR CREER UN NOUVEAU FICHIER DE SCENARIO ------
+
+1. Creez votre fichier
+2. Ajoutez en premiere ligne le nombre de trains total
+3. Ajouter avant chaque details du train le numero du train
+4. Ajoutez les details des trains (Type, Depart, Arrivee)
+
+Type:
+TGV
+GL (Grande Ligne)
+M (Marchandise)
+
+Depart/Arrivee:
+A
+B
+C
+D
+EST
+
+Un train ne peut arriver que par les voies EST, A et C.
+Un train ne peut sortir que par les voies EST, B et D.
+Un train ne peut pas avoir le meme depart et la meme arrivee
+Un train dont le depart s'effectue voie A ou C ne peut pas arriver
+en voie B ou D.
+Un train de marchandises peut emprunter uniquement les voies A, B
+et EST.
+Les Grandes Lignes et les TGV peuvent emprunter toutes les voies.
+
+-------------------------- FICHIER TYPE ---------------------------
+
+3
+1
+TGV
+EST
+D
+2
+GL
+C
+EST
+3
+M
+EST
+B
+
+-------------------------------------------------------------------
+
+Dans ce fichier on a donc 3 trains au total:
+Un TGV qui arrive de la voie EST pour aller en voie D,
+un GL qui arrive voie C pour aller en voie EST
+et un M qui arrive voie EST pour aller en voie B.

@@ -158,26 +158,32 @@ void* fonc_EST(int* arg)
   printf("le Train %d passe le tunnel, et arrive dans la voie de garage.\n", numero[3]);
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
-  if (numero[0] == 1)
+  if (numero[0] == 1)/*Pour un TGV*/
   {
     p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
     p[3] = removeTrain(p[3]);
   }
-  else if (numero[0] == 3)
+  else if (numero[0] == 3)/*Pour un M*/
   {
     p[4] = addTrain(p[4],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM1, &mutex);
     p[4] = removeTrain(p[4]);
   }
-  else if (numero[0] == 2)
+  else if (numero[0] == 2)/*Pour une GL*/
   {
     p[6] = addTrain(p[6],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
     p[6] = removeTrain(p[6]);
+  }
+
+  if (numero[2] == 4)
+  {
+    printf("Le Train %d s'arrete a la gare et recupère ses passagers.\n", numero[3]);
+    sleep(1);
   }
 
   printf("Le Train %d part vers sa destination finale.\n", numero[3]);
@@ -209,19 +215,19 @@ void* fonc_A(void* arg)
   printf("le Train %d a passé l'aiguillage, et arrive dans la voie de garage.\n", numero[3]);
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
-  if (numero[0] == 1) {
+  if (numero[0] == 1) /*Pour un TGV*/{
     p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&ATGV, &mutex);
     p[3] = removeTrain(p[3]);
   }
-  else if (numero[0] == 3) {
+  else if (numero[0] == 3) /*Pour un M*/{
     p[5] = addTrain(p[5],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AM2, &mutex);
     p[5] = removeTrain(p[5]);
   }
-  else if (numero[0] == 2) {
+  else if (numero[0] == 2) /*Pour une GL*/{
     p[6] = addTrain(p[6],numero[3]);
     pthread_cond_signal(&superviseur);
     pthread_cond_wait(&AGL, &mutex);
@@ -248,6 +254,9 @@ void* fonc_C(void* arg)
   p[1] = addTrain(p[1],numero[3]);
   pthread_cond_wait(&LC,&mutex);
   p[1] = removeTrain(p[1]);
+
+printf("Le Train %d s'arrete a la gare et recupère ses passagers.\n", numero[3]);
+sleep(1);
 
   printf("le Train %d passe l'aiguillage, et arrive dans la voie de garage.\n", numero[3]);
   printf("Appuyez sur entrée pour continuer\n");
