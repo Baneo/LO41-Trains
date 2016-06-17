@@ -24,6 +24,7 @@ pthread_cond_t LA,LC,LEST,ATGV,AM1,AM2,AGL,superviseur;
 int shmid;
 
 int print_full_info = 0;
+int pas;
 
 typedef struct elem{
     int train;
@@ -156,8 +157,11 @@ void* fonc_EST(int* arg)
   pthread_cond_wait(&LEST,&mutex);
   p[2] = removeTrain(p[2]);
   printf("le Train %d passe le tunnel, et arrive dans la voie de garage.\n", numero[3]);
+  if(pas == 1)
+  {
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
+  }
   if (numero[0] == 1)/*Pour un TGV*/
   {
     p[3] = addTrain(p[3],numero[3]);
@@ -183,13 +187,15 @@ void* fonc_EST(int* arg)
   if (numero[2] == 4)
   {
     printf("Le Train %d s'arrete a la gare et recupère ses passagers.\n", numero[3]);
-    sleep(1);
+    if(pas == 1) sleep(1);
   }
 
   printf("Le Train %d part vers sa destination finale.\n", numero[3]);
+  if(pas == 1)
+  {
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
-
+  }
   pthread_mutex_unlock(&mutex);
   pthread_cond_signal(&superviseur);
 
@@ -212,9 +218,13 @@ void* fonc_A(void* arg)
   p[0] = addTrain(p[0],numero[3]);
   pthread_cond_wait(&LA,&mutex);
   p[0] = removeTrain(p[0]);
+
   printf("le Train %d a passé l'aiguillage, et arrive dans la voie de garage.\n", numero[3]);
+  if(pas == 1)
+  {
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
+  }
   if (numero[0] == 1) /*Pour un TGV*/{
     p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
@@ -234,8 +244,11 @@ void* fonc_A(void* arg)
     p[6] = removeTrain(p[6]);
   }
   printf("Le Train %d part vers sa destination finale.\n", numero[3]);
+  if(pas == 1)
+  {
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
+  }
   pthread_cond_signal(&superviseur);
   pthread_mutex_unlock(&mutex);
     return 0;
@@ -255,12 +268,16 @@ void* fonc_C(void* arg)
   pthread_cond_wait(&LC,&mutex);
   p[1] = removeTrain(p[1]);
 
-printf("Le Train %d s'arrete a la gare et recupère ses passagers.\n", numero[3]);
-sleep(1);
+  printf("Le Train %d s'arrete a la gare et recupère ses passagers.\n", numero[3]);
+  if(pas == 1) sleep(1);
 
   printf("le Train %d passe l'aiguillage, et arrive dans la voie de garage.\n", numero[3]);
+  if(pas == 1)
+  {
+
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
+  }
   if (numero[0] == 1) /*Pour un TGV*/ {
     p[3] = addTrain(p[3],numero[3]);
     pthread_cond_signal(&superviseur);
@@ -284,8 +301,11 @@ sleep(1);
     printf("prob fonc c\n");
   }
   printf("Le Train %d part vers sa destination finale.\n", numero[3]);
+  if(pas == 1)
+  {
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
+  }
   pthread_cond_signal(&superviseur);
   pthread_mutex_unlock(&mutex);
   return 0;
@@ -397,6 +417,15 @@ int main(void)
   /*Handler signaux*/
   signal(SIGINT,traitantSIGINT);
   signal(SIGTSTP,traitantSIGTSTP);
+  printf("Voulez vous le mode pas a pas ?\n");
+  printf("1. Oui\n");
+  printf("2. Non\n");
+  scanf("%d", &pas);
+  while(pas != 1 && pas != 2)
+  {
+    printf("Mauvaise entrée, recommencez\n");
+    scanf("%d", &pas);
+  }
 
   /*récupération du nom du fichier*/
   printf("Entrez le chemin du fichier a utiliser:\n");
@@ -544,17 +573,20 @@ int main(void)
   sleep(2);
   printf("Trains de la voie EST:\n");
   PrintTrainLine(p[2]);
+ if(pas == 1){
   printf("Appuyez sur entrée pour continuer\n");
   getchar();
-  getchar();
+  getchar();}
   printf("Trains de la voie A:\n");
   PrintTrainLine(p[0]);
+  if(pas == 1){
   printf("Appuyez sur entrée pour continuer\n");
-  getchar();
+  getchar(); }
   printf("Trains de la voie C:\n");
   PrintTrainLine(p[1]);
+  if(pas == 1){
   printf("Appuyez sur entrée pour continuer\n");
-  getchar();
+  getchar();  }
 
   pthread_cond_signal(&superviseur);
 
